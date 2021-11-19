@@ -169,7 +169,7 @@ EVEREST | {{ event.event_name }} Reports
           {% for event in user_registered_events %}
           <tr>
             <td><img class="profile-img my-auto" alt="{{ event.user.profile_pic }}"
-                style="min-width: 3rem !important; min-height: 3rem !important;"
+                style="width: 3rem !important; height: 3rem !important;"
                 src="{% if event.user.profile_pic %}{{ event.user.profile_pic.url }}{% else %}https://icon-library.com/images/generic-user-icon/generic-user-icon-19.jpg{% endif %}" />
             </td>
             <td>{{ event.user.user.first_name }}</td>
