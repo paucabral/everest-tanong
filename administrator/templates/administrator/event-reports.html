@@ -1,0 +1,246 @@
+{% extends 'administrator/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | {{ event.event_name }} Reports
+{% endblock %}
+
+{% block content %}
+
+<main class="container-fluid mx-1">
+
+  <!-- start Popup -->
+  {% for message in messages %}
+    {% if form.errors %}
+      {% for field in form %}
+        {% for error in field.errors %}
+          <div class="alert alert-danger alert-dismissible"
+            style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+            <strong>{{ error|escape }}</strong>
+            <button type="button" class="close btn btn-interact text-white" data-dismiss="alert"
+              style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+          </div>
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+      <p class="alert alert-danger alert-link alert-dismissible text-white"
+        style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+        {{ message }}
+        <button type="button" class="close btn btn-interact" data-dismiss="alert"
+          style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+      </p>
+    {% else %}
+      <p class="alert alert-success alert-link alert-dismissible text-white"
+        style="z-index: 2; background-color: #27AE60; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+        {{message}}
+        <button type="button" class="close btn btn-interact" data-dismiss="alert"
+          style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+      </p>
+    {% endif %}
+  {% endfor %}
+  <!-- end Popup -->
+
+  <div class="col container-fluid">
+    <div
+      class="shadow mb-5 card card-item-event {% if event.event_type == 'CONFERENCE' %}card-header-conference{% elif event.event_type == 'SEMINAR' %}card-header-seminar{% else %}card-header-workshop{% endif %}"
+      style="align-items: center; border: none; border-radius: 0.5em !important;">
+      <h3 class="card-header brand text-white" style="text-transform: uppercase; text-align: center;">{{ event.event_name }}</h3>
+
+      <div class="card-body" style="background-color: aliceblue; width: 100%; border-bottom-left-radius: 0.5em !important; border-bottom-right-radius: 0.5em !important;">
+
+        <div class="position-relative mb-2">
+          <a class="btn btn-warning" href="/administrator/events/update/{{event.id}}"><span
+              style="color:white;"><i class="fas fa-edit"></i></span></a>
+        </div>
+
+        <div class="card-title container-fluid">
+          {{ event.detailed_description|safe }}
+        </div>
+        
+        <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">REGISTERED</h5>
+            <span style="text-transform: uppercase;">{{ registered }}</span>
+          </div>
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">ATTENDED</h5>
+            {{ attended }}
+          </div>
+        </div>
+
+        <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <span><i>{{ event.short_description }}</i></span>
+          </div>
+        </div>
+
+        <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">DATE AND TIME</h5>
+            <span style="text-transform: uppercase;">{{ event.date }}</span>
+          </div>
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">LOCATION</h5>
+            {{ event.location }}
+          </div>
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">EVENT TYPE</h5>
+            {{ event.event_type }}
+          </div>
+        </div>
+
+        <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">PRICE</h5>
+            {{ event.cost }}: {{ event.price }}
+          </div>
+        </div>
+        <br>
+
+        <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+          {% if event.is_registration_open %}
+            <h5 class="mb-2"><i>Registration for the event is currently open.</i></h5>
+          {% else %}
+            <h5 class="mb-2"><i>Registration is either closed or not yet available.</i></h5>
+          {% endif %}
+          
+          {% if event.is_attendance_open %}
+            <h5 class="mb-2"><i>The event is currently open for attendance.</i></h5>          
+          {% else %}
+            <h5 class="mb-2"><i>Attendance is closed at the moment.</i></h5>
+          {% endif %}
+        </div>
+        <br>
+        </div>
+
+      </div>
+    </div>
+
+    <section>
+    
+      <section class="container container-fluid">
+        <h3 class="text-center" style="font-weight: bold;">REGISTRATION AND ATTENDANCE</h3>
+        <hr class="my-4">
+      </section>
+    
+      <form method="GET" class="form-control container-fluid mb-2 p-3" style="border: none;">
+        <div class="container-fluid row" style="align-items: center; text-align: center;">
+    
+          <div class="form-group col-md" style="align-items: center; text-align: center;">
+            <label for="id_event_type">Attendance: </label>
+            {{ transactions_filter.form.attendance_bool }}
+          </div>
+    
+          <div class="form-group col-md" style="align-items: center; text-align: center;">
+            <label for="id_event_type">Registration Status: </label>
+            {{ transactions_filter.form.approval }}
+          </div>
+    
+          <div class="form-group col container">
+            <button class="btn btn-secondary"
+              style="font-weight: bold; background-color: rgba(34, 166, 170, 0.918); border: none;"
+              type="submit">FILTER</button>
+          </div>
+        </div>
+      </form>
+    
+      <div class="container-fluid">
+        <table id="qlist" style="width: 100%;">
+          <thead>
+            <th>
+    
+            </th>
+            <th>
+              FIRST NAME
+            </th>
+            <th>
+              LAST NAME
+            </th>
+            <th>
+              REGISTRATION STATUS
+            </th>
+            <th>
+              ATTENDANCE
+            </th>
+            <th></th>
+          </thead>
+    
+          {% for event in user_registered_events %}
+          <tr>
+            <td><img class="profile-img my-auto" alt="{{ event.user.profile_pic }}"
+                style="min-width: 3rem !important; min-height: 3rem !important;"
+                src="{% if event.user.profile_pic %}{{ event.user.profile_pic.url }}{% else %}https://icon-library.com/images/generic-user-icon/generic-user-icon-19.jpg{% endif %}" />
+            </td>
+            <td>{{ event.user.user.first_name }}</td>
+            <td>{{ event.user.user.last_name }}</td>
+            <td
+              class="{% if event.is_registration_approved == 'APPROVED' %}bg-success{% elif event.is_registration_approved == 'PENDING' %}bg-primary{% else %}bg-danger{% endif %}"
+              style="text-align: center; color: white;">{{ event.is_registration_approved }}</td>
+            <td style="text-transform: uppercase;">
+              {% if event.time_of_attendance %}
+                {{ event.time_of_attendance }}
+              {% else %}
+                N/A
+              {% endif  %}
+            </td>
+            <td>
+              <a class="btn btn-interact btn-primary" href="/administrator/members/member/{{ event.user.user.id }}/profile">Profile</a>
+            </td>
+          </tr>
+          {% endfor %}
+    
+        </table>
+      </div>
+    </section>
+  </div>
+
+</main>
+
+<script>
+  $(document).ready(function () {
+    $('#qlist').DataTable({
+      dom: 'Bfrltip',
+      buttons: [
+        {
+          extend: 'csv',
+          text: 'CSV',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 1))'
+          }
+        },
+        {
+          extend: 'excel',
+          text: 'Excel',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 1))'
+          }
+        },
+        {
+          extend: 'pdf',
+          text: 'PDF',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 1))'
+          }
+        },
+        {
+          extend: 'print',
+          text: 'Print',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 1))'
+          }
+        },
+      ],
+      "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "All"]],
+      "pagingType": "full_numbers",
+      "pageLength": 10,
+      "scrollX": true
+    });
+  });
+</script>
+
+{% endblock %}

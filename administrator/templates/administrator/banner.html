@@ -1,0 +1,152 @@
+{% extends 'administrator/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | Announcements
+{% endblock %}
+
+{% block content %}
+
+<style>
+  upload-image-receipt {
+    min-height: 20em;
+  }
+</style>
+
+<main>
+
+  <!-- start Popup -->
+  {% for message in messages %}
+  {% if form.errors %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  <div class="alert alert-danger alert-dismissible"
+    style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="close btn btn-interact text-white" data-dismiss="alert"
+      style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+  </div>
+  {% endfor %}
+  {% endfor %}
+  {% endif %}
+  {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+  <p class="alert alert-danger alert-link alert-dismissible text-white"
+    style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+    {{ message }}
+    <button type="button" class="close btn btn-interact" data-dismiss="alert"
+      style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+  </p>
+  {% else %}
+  <p class="alert alert-success alert-link alert-dismissible text-white"
+    style="z-index: 2; background-color: #27AE60; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+    {{message}}
+    <button type="button" class="close btn btn-interact" data-dismiss="alert"
+      style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+  </p>
+  {% endif %}
+  {% endfor %}
+  <!-- end Popup -->
+
+    <div style="margin: 1em">
+      <div class="form-group row">
+        <div class="col-md" style="margin-top:0.5rem; margin-bottom:0.5rem;">
+
+          <!-- Data to output later -->
+          <h6 style="font-weight: bold; text-align: center;">ANNOUNCEMENTS PREVIEW</h6>
+          <div id="carouselIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel" style="z-index: 0;">
+            <div class="carousel-indicators">
+              <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="0" class="active" aria-current="true"
+                aria-label="Slide 1"></button>
+              <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+              <button type="button" data-bs-target="#carouselIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                {% if banner1 %}
+                <img class="announcement-banner d-block w-100" src="{{ banner1.banner_img.url }}" />
+                {% else %}
+                <div class="bg-success" style="height: 25.5em; text-align: center; display: flex; justify-content: center; align-items: center;">No announcement posted.</div>
+                {% endif %}
+              </div>
+              <div class="carousel-item">
+                {% if banner2 %}
+                <img class="announcement-banner d-block w-100" src="{{ banner2.banner_img.url }}" />
+                {% else %}
+                <div class="bg-primary" style="height: 25.5em; text-align: center; display: flex; justify-content: center; align-items: center;">No announcement posted.</div>
+                {% endif %}
+              </div>
+              <div class="carousel-item">
+                {% if banner3 %}
+                <img class="announcement-banner d-block w-100" src="{{ banner3.banner_img.url }}" />
+                {% else %}
+                <div class="bg-danger" style="height: 25.5em; text-align: center; display: flex; justify-content: center; align-items: center;">No announcement posted.</div>
+                {% endif %}
+              </div>
+            </div>
+            <a class="carousel-control-prev" href="#carouselIndicators" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselIndicators" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+
+          <!-- End Data to output later -->
+
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="row">
+          <form method="POST" enctype='multipart/form-data'>
+            {% csrf_token %}
+          
+            <div class="container-fluid" style="margin: 1em;">
+              <div class="form-group row">
+                <div class="col-md" style="margin-top:0.5rem; margin-bottom:0.5rem;">
+                  <h5>Add a new announcement banner:</h5>
+                  <p><i><b>Note:</b> This upload form only accepts images. The recommended image aspect ratio is: <b>10.51:4.06</b> (ex. 1051px by 406px image). Otherwise, the image would be cropped from the center. The image preview below is a point of reference.</i></p>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-md-3" style="margin-top:0.5rem; margin-bottom:0.5rem;">
+                  {{ form.position }}
+                </div>
+                <div class="col-md" style="margin-top:0.5rem; margin-bottom:0.5rem;">
+                  {{ form.banner_img }}
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-md" style="margin-bottom:0.5rem;">
+                  <img id="image" class="my-2"/>
+                  <div id="placeholderdiv"
+                    class="announcement-banner"
+                    style="background-color: rgb(219, 225, 226); width: 100%; height: 25.5em; text-align: center; display: flex; align-items: center; justify-content: center;">
+                    <h6 style="font-weight: bold;">Attachment Preview</h6>
+                  </div>
+              
+                </div>
+              </div>
+              <div class="form-group row my-3">
+                <div class="col-md">
+                  <button type="submit" class="btn btn-info form-control text-white" style="font-weight: 800;">SAVE</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+</main>
+
+<script>
+  document.getElementById('id_banner_img').onchange = function () {
+    var src = URL.createObjectURL(this.files[0])
+    document.getElementById('image').src = src
+    document.getElementById('image').className = "my-2 announcement-banner"
+    document.getElementById('placeholderdiv').style.display = "none";
+  }
+</script>
+
+{% endblock %}

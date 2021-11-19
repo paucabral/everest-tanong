@@ -1,0 +1,95 @@
+{% extends 'member/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | Events Joined
+{% endblock %}
+
+{% block content %}
+<style>
+#id_search_fields {
+  width: 9em !important;
+}
+
+#id_cost {
+  width: 4.2em !important;
+}
+
+#id_event_type {
+  width: 8.5em !important;
+}
+
+#id_approval {
+  width: 7em !important;
+}
+</style>
+
+<main class="container-fluid">
+
+  <form method="GET" class="form-control container-fluid mb-3 p-3" style="border: none;">
+    <div class="container-fluid row" style="align-items: center; text-align: center;">
+      <div class="form-group col-md-4">
+        <label for="id_name">Keyword: </label><br>
+        {{ joined_events_filter.form.search_fields }}
+      </div>
+
+      <div class="form-group col-md-1">
+        <label for="id_cost">Price: </label><br>
+        {{ joined_events_filter.form.cost }}
+      </div>
+
+      <div class="form-group col-md-2">
+        <label for="id_event_type">Type: </label><br>
+        {{ joined_events_filter.form.event_type }}
+      </div>
+
+      <div class="form-group col-md-2">
+        <label for="id_event_type">Status: </label><br>
+        {{ joined_events_filter.form.approval }}
+      </div>
+
+      <div class="form-group col container">
+        <button class="btn btn-secondary"
+          style="font-weight: bold; background-color: rgba(34, 166, 170, 0.918); border: none;"
+          type="submit">SEARCH</button>
+      </div>
+    </div>
+  </form>
+
+  <section class="container container-fluid">
+    <div class="row">
+      {% for event in user_registered_events %}
+
+      
+      <div class="col container-fluid col-md-4 my-2">
+        <div
+          class="shadow mb-5 h-100 card card-item-event {% if event.event.event_type == 'CONFERENCE' %}card-header-conference{% elif event.event.event_type == 'SEMINAR' %}card-header-seminar{% else %}card-header-workshop{% endif %}"
+          style="align-items: center; text-align: center; border: none;">
+          <h3 class="card-header brand text-white" style="text-transform: uppercase;">{{ event.event.event_name }}</h3>
+          <div class="card-body" style="background-color: aliceblue; width: 100%;">
+            <h5 class="card-title">{{ event.event.short_description }}</h5>
+            <p class="card-text" style="font-size: 0.8em;">
+              <span style="text-transform: uppercase;">{{ event.event.date }}</span>
+              <br>
+              {{ event.event.location }}
+            </p>
+            <p class="card-text" style="font-weight: bold;">{{ event.event_type }}</p>
+
+            <p class="card-text">
+              {{ event.event.cost }} {{ event.event.price }}<br>
+            </p>
+            <br>
+
+            <a href="/member/events/event/{{ event.event.id }}" class="btn btn-details mb-2">MORE DETAILS</a>
+          </div>
+        </div>
+      </div>
+     
+
+      {% endfor %}
+    </div>
+  </section>
+
+</main>
+
+{% endblock %}

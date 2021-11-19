@@ -1,0 +1,148 @@
+{% extends 'administrator/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | List of Members
+{% endblock %}
+
+{% block content %}
+<main class="container-fluid">
+
+  <h1 class="text-center" style="font-weight: bold;">LIST OF MEMBERS</h1>
+  <hr class="my-4">
+
+  {% for message in messages %}
+  {% if form.errors %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  <div class="alert alert-danger alert-dismissible"
+    style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="close btn btn-interact text-white" data-dismiss="alert"
+      style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+  </div>
+  {% endfor %}
+  {% endfor %}
+  {% endif %}
+  {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+  <p class="alert alert-danger alert-link alert-dismissible text-white"
+    style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+    {{ message }}
+    <button type="button" class="close btn btn-interact" data-dismiss="alert"
+      style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+  </p>
+  {% else %}
+  <p class="alert alert-success alert-link alert-dismissible text-white"
+    style="z-index: 2; background-color: #27AE60; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+    {{message}}
+    <button type="button" class="close btn btn-interact" data-dismiss="alert"
+      style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+  </p>
+  {% endif %}
+  {% endfor %}
+  
+  <div class="">
+    <table id="qlist" style="width: 100%;">
+      <thead>
+        <th>
+          
+        </th>
+        <th>
+          FIRST NAME
+        </th>
+        <th>
+          LAST NAME
+        </th>
+        <th>
+          USERNAME
+        </th>
+        <th>
+          EVENTS ATTENDED
+        </th>
+        <th></th>
+        <th></th>
+      </thead>
+
+      {% for member in members %}
+      <tr>
+        <td><img class="profile-img my-auto" alt="{{ request.user.username }}"
+          src="{% if member.profile.profile_pic %}{{ member.profile.profile_pic.url }}{% else %}{% static 'img/default-profile-icon.jpg' %}{% endif %}" /></td>
+        <td>{{ member.first_name }}</td>
+        <td>{{ member.last_name }}</td>
+        <td>{{ member.username }}</td>
+        <td>
+          <ul class="list-group">
+            {% for event in registered_events %}
+              {% if event.user.id == member.profile.id %}
+                <li class="list-group-item">{{ event.event.event_name }}</li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </td>
+        <td>
+          <a class="btn btn-interact btn-primary" href="/administrator/members/member/{{ member.profile.user.id }}/profile">Profile</a>
+        </td>
+        <td>
+          <form
+            onsubmit="return confirm('WARNING: All account information including login credentials will be deleted in the process. Are you sure you want to delete the user: {{ member.username }}?');"
+            method="POST" action="{% url 'delete-member' member.id  %}">{% csrf_token %}
+            <button type="submit" class="btn btn-interact btn-danger">Delete</button><input type="hidden" name="q_id"
+              value="{{i.id}}" />
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+
+    </table>
+  </div>
+
+
+</main>
+
+<script>
+  $(document).ready(function () {
+    $('#qlist').DataTable({
+      dom: 'Bfrltip',
+      buttons: [
+        {
+          extend: 'csv',
+          text: 'CSV',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 2))'
+          }
+        },
+        {
+          extend: 'excel',
+          text: 'Excel',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 2))'
+          }
+        },
+        {
+          extend: 'pdf',
+          text: 'PDF',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 2))'
+          }
+        },
+        {
+          extend: 'print',
+          text: 'Print',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 2))'
+          }
+        },
+      ],
+      "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "All"]],
+      "pagingType": "full_numbers",
+      "pageLength": 10,
+      "scrollX": true
+    });
+  });
+</script>
+
+{% endblock %}

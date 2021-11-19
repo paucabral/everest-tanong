@@ -1,0 +1,113 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | Register
+{% endblock %}
+
+{% block content %}
+<div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-signin my-5">
+          <div class="card-body">
+            <h3 class="text-center">Sign up an account</h3>
+            <br />
+            <!-- This form is assigned with a method of post request since it is meant to send a data/payload to the backend  -->
+            <form class="form-signin" method="POST">
+              {% csrf_token %}
+              <!-- Declaring a CSRF Token is required for post requests in Django forms -->
+
+              <div class="form-label-group">
+                <div class="row">
+                  <div class="col form-label-group">
+                    {{ form.first_name }}
+                    <label for="id_first_name">First Name</label>
+                  </div>
+                  <div class="col form-label-group">
+                    {{ form.last_name }}
+                    <label for="id_last_name">Last Name</label>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="form-label-group">
+                    {{ form.email }}
+                    <label for="id_email">Email</label>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="form-label-group">
+                    {{ form.username }}
+                    <label for="id_username">Username</label>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="form-label-group">
+                    {{ form.password1 }}
+                    <label for="id_password1">Password</label>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="form-label-group">
+                    {{ form.password2 }}
+                    <label for="id_password2">Confirm Password</label>
+                  </div>
+                </div>
+
+                <script>
+                  var password = document.getElementById("id_password1"),
+                    confirm_password =
+                      document.getElementById("id_password2");
+
+                  function validatePassword() {
+                    if (password.value != confirm_password.value) {
+                      confirm_password.setCustomValidity(
+                        "Passwords do not match."
+                      );
+                    } else {
+                      confirm_password.setCustomValidity("");
+                    }
+                  }
+
+                  password.onchange = validatePassword;
+                  confirm_password.onkeyup = validatePassword;
+                </script>
+              </div>
+
+              <button name="Create User" class="btn text-uppercase" type="submit" style="width: 100%;">
+                Sign Up
+              </button>
+              <hr class="my-4" />
+              <p class="text-center">
+                Already have an account?
+                <a href="{% url 'login' %}" style="text-decoration: none;">Login</a>
+              </p>
+              {% for message in messages %}
+                {% if form.errors %}
+                  {% for field in form %}
+                    {% for error in field.errors %}
+                      <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                      </div>
+                    {% endfor %}
+                  {% endfor %}
+                    {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger">
+                      <strong>{{ error|escape }}</strong>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

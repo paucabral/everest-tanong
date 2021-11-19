@@ -1,0 +1,110 @@
+{% extends 'administrator/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | Set Transaction Status
+{% endblock %}
+
+{% block content %}
+
+<style>
+  upload-image-receipt {
+    min-height: 20em;
+  }
+</style>
+
+<main class="">
+
+  <!-- start Popup -->
+  {% for message in messages %}
+  {% if form.errors %}
+  {% for field in form %}
+  {% for error in field.errors %}
+  <div class="alert alert-danger alert-dismissible"
+    style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+    <strong>{{ error|escape }}</strong>
+    <button type="button" class="close btn btn-interact text-white" data-dismiss="alert"
+      style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+  </div>
+  {% endfor %}
+  {% endfor %}
+  {% endif %}
+  {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+  <p class="alert alert-danger alert-link alert-dismissible text-white"
+    style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+    {{ message }}
+    <button type="button" class="close btn btn-interact" data-dismiss="alert"
+      style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+  </p>
+  {% else %}
+  <p class="alert alert-success alert-link alert-dismissible text-white"
+    style="z-index: 2; background-color: #27AE60; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+    {{message}}
+    <button type="button" class="close btn btn-interact" data-dismiss="alert"
+      style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+  </p>
+  {% endif %}
+  {% endfor %}
+  <!-- end Popup -->
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <div class="form-group row" style="margin-left: 1em;">
+      <div class="form-group row">
+        <div class="col-md" style="margin-top:0.5rem; margin-bottom:0.5rem;">
+
+          <!-- Data to output later -->
+
+          <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+            <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+              <h4 style="font-weight: bold;">{{ transaction.event.event_name }}</h4>
+            </div>
+          </div>
+
+          <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+            <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+              <h5 style="font-weight: bold;">MEMBER:</h5>
+              <span style="text-transform: uppercase;">{{ transaction.user.user.last_name }}, {{ transaction.user.user.first_name }}</span>
+            </div>
+            <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+              <h5 style="font-weight: bold;">AFFILIATION:</h5>
+              <span style="text-transform: uppercase;">{{ transaction.user.affiliation }}</span>
+            </div>
+            <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+              <h5 style="font-weight: bold;">DATE OF TRANSACTION:</h5>
+              <span style="text-transform: uppercase;">{{ transaction.date_created }}</span>
+            </div>
+          </div>
+          <!-- End Data to output later -->
+          <br>
+          <br>
+          <div class="row container-fluid">
+            <div class="col-md-8 container-fluid" style="border-radius: 0; border: none;">
+              <h5>Submitted receipt/proof of payment subject to verification:</h5>
+            </div>
+            <div class="col-md container-fluid" style="border-radius: 0; border: none;">
+              <div>
+                {{ form.is_registration_approved }}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-md" style="margin-top:0.5rem; margin-bottom:0.5rem;">
+          <img id="image" class="my-2" style="width: 100%; object-fit: cover; align-self: center;" src="{{ transaction.receipt.url }}"/>
+        </div>
+      </div>
+      <div class="form-group row my-3">
+        <div class="col-md">
+          <button type="submit" class="btn btn-secondary form-control text-white" style="font-weight: 800;">CHANGE STATUS</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+</main>
+
+{% endblock %}

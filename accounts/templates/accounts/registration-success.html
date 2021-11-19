@@ -1,0 +1,31 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | Registration Successful
+{% endblock %}
+
+{% block content %}
+<div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-signin my-5">
+          <div class="card-body">
+            <h3 class="text-center">Registration Successful!</h3>
+            <br />
+
+            <p class="text-center">
+              You have successfully registered an account. You may now
+              proceed on logging in.
+            </p>
+
+            <a name="Create User" class="btn text-uppercase text-white bg-info" href="{% url 'login' %}"
+              style="width: 100%;"><b>LOGIN</b></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

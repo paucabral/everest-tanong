@@ -1,0 +1,2 @@
+release: python manage.py migrate --no-input && python manage.py createsuperuserwithpassword --username adminusername --password adminpassword --email adminemail@example.org --preserve
+web: gunicorn event_registration_system.wsgi

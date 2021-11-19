@@ -1,0 +1,157 @@
+{% extends 'administrator/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | List of Events
+{% endblock %}
+
+{% block content %}
+<main class="container-fluid">
+
+  <h1 class="text-center" style="font-weight: bold;">LIST OF EVENTS</h1>
+  <hr class="my-4">
+
+  {% for message in messages %}
+    {% if form.errors %}
+      {% for field in form %}
+        {% for error in field.errors %}
+          <div class="alert alert-danger alert-dismissible" style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+            <strong>{{ error|escape }}</strong>
+            <button type="button" class="close btn btn-interact text-white" data-dismiss="alert" style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+          </div>
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+      <p class="alert alert-danger alert-link alert-dismissible text-white" style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+        {{ message }}
+        <button type="button" class="close btn btn-interact" data-dismiss="alert" style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+      </p>
+    {% else %}
+      <p class="alert alert-success alert-link alert-dismissible text-white" style="z-index: 2; background-color: #27AE60; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+        {{message}}
+        <button type="button" class="close btn btn-interact" data-dismiss="alert" style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+      </p>
+    {% endif %}
+  {% endfor %}
+  
+  <form method="GET" class="form-control container-fluid mb-3 p-3" style="border: none;">
+    <div class="container-fluid row" style="align-items: center; text-align: center;">
+      <div class="form-group col-md-4">
+        <label for="id_name">Keyword: </label>
+        {{ find_event_filter.form.search_fields }}
+      </div>
+  
+      <div class="form-group col-md-2">
+        <label for="id_cost">Price: </label>
+        {{ find_event_filter.form.cost }}
+      </div>
+  
+      <div class="form-group col-md-3">
+        <label for="id_event_type">Type: </label>
+        {{ find_event_filter.form.event_type }}
+      </div>
+  
+      <div class="form-group col container">
+        <button class="btn btn-secondary"
+          style="font-weight: bold; background-color: rgba(34, 166, 170, 0.918); border: none;"
+          type="submit">SEARCH</button>
+      </div>
+    </div>
+  </form>
+  
+  <div>
+    <table id="qlist" style="width: 100%;">
+      <thead>
+        <th>
+          ID
+        </th>
+        <th>
+          EVENT
+        </th>
+        <th>
+          DATE
+        </th>
+        <th>
+          DESCRIPTION
+        </th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </thead>
+  
+      {% for event in events %}
+      <tr>
+        <td>{{ event.id }}</td>
+        <td>{{ event.event_name }}</td>
+        <td>{{ event.date }}</td>
+        <td>{{ event.short_description }}</td>
+        <td>
+          <a class="btn btn-interact btn-primary" href="/administrator/events/event/{{ event.id }}/reports">Reports</a>
+        </td>
+        <td>
+          <a class="btn btn-interact btn-warning" href="/administrator/events/update/{{event.id}}"><span
+              style="color:white;">Update</span></a>
+        </td>
+        <td>
+          <form onsubmit="return confirm('WARNING: Deleting an item is irreversible. Are you sure you want to delete the event: {{ event.id }} - {{ event.event_name }}?');" method="POST" action="{% url 'delete-event' event.id  %}">{% csrf_token %}
+            <button type="submit" class="btn btn-interact btn-danger">Delete</button><input type="hidden" name="q_id"
+              value="{{i.id}}" />
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+  
+    </table>
+  </div>
+
+
+</main>
+
+<script>
+  $(document).ready(function () {
+    $('#qlist').DataTable({
+      dom: 'Bfrltip',
+      buttons: [
+        {
+          extend: 'csv',
+          text: 'CSV',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 3))'
+          }
+        },
+        {
+          extend: 'excel',
+          text: 'Excel',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 3))'
+          }
+        },
+        {
+          extend: 'pdf',
+          text: 'PDF',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 3))'
+          }
+        },
+        {
+          extend: 'print',
+          text: 'Print',
+          className: 'btn btn-default',
+          exportOptions: {
+            columns: 'th:not(:nth-last-child(-n + 3))'
+          }
+        },
+      ],
+      "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "All"]],
+      "pagingType": "full_numbers",
+      "pageLength": 10,
+      "scrollX": true
+    });
+  });
+</script>
+
+{% endblock %}

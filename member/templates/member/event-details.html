@@ -1,0 +1,165 @@
+{% extends 'member/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | {{ event.event_name }}
+{% endblock %}
+
+{% block content %}
+
+<main class="container-fluid">
+
+  <!-- start Popup -->
+  {% for message in messages %}
+    {% if form.errors %}
+      {% for field in form %}
+        {% for error in field.errors %}
+          <div class="alert alert-danger alert-dismissible"
+            style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+            <strong>{{ error|escape }}</strong>
+            <button type="button" class="close btn btn-interact text-white" data-dismiss="alert"
+              style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+          </div>
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+      <p class="alert alert-danger alert-link alert-dismissible text-white"
+        style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+        {{ message }}
+        <button type="button" class="close btn btn-interact" data-dismiss="alert"
+          style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+      </p>
+    {% else %}
+      <p class="alert alert-success alert-link alert-dismissible text-white"
+        style="z-index: 2; background-color: #27AE60; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+        {{message}}
+        <button type="button" class="close btn btn-interact" data-dismiss="alert"
+          style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+      </p>
+    {% endif %}
+  {% endfor %}
+  <!-- end Popup -->
+
+  <div class="col container-fluid">
+    <div
+      class="shadow mb-5 card card-item-event {% if event.event_type == 'CONFERENCE' %}card-header-conference{% elif event.event_type == 'SEMINAR' %}card-header-seminar{% else %}card-header-workshop{% endif %}"
+      style="align-items: center; border: none; border-radius: 0.5em !important;">
+      <h3 class="card-header brand text-white" style="text-transform: uppercase; text-align: center;">{{ event.event_name }}</h3>
+      
+      <div class="card-body" style="background-color: aliceblue; width: 100%; border-bottom-left-radius: 0.5em !important; border-bottom-right-radius: 0.5em !important;">
+
+        <div class="card-title container-fluid">
+          {{ event.detailed_description|safe }}
+        </div>
+
+        <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <span><i>{{ event.short_description }}</i></span>
+          </div>
+        </div>
+
+        <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">DATE AND TIME</h5>
+            <span style="text-transform: uppercase;">{{ event.date }}</span>
+          </div>
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">LOCATION</h5>
+            {{ event.location }}
+          </div>
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">EVENT TYPE</h5>
+            {{ event.event_type }}
+          </div>
+        </div>
+
+        <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+          <div class="col container-fluid form-control" style="border-radius: 0; border-width: 2.5px; margin: 1px;">
+            <h5 style="font-weight: bold;">PRICE</h5>
+            {{ event.cost }}: {{ event.price }}
+          </div>
+        </div>
+        <br>
+
+        <div class="row row-eq-height container-fluid" style="align-items: center; text-align: center;">
+          {% if event.is_registration_open and event.id in user_registered_events_approved and event.id not in user_registered_events_pending and event.id not in user_registered_events_rejected and event.id not in user_confirmed_attendance %}
+            {% if event.cost == "FREE" %}
+              <div class="col container-fluid" style="align-items: center; text-align: center;">
+                <div class="form-group col-md my-3" style="margin-left: 1em; margin-right: 1em;">
+                  <form style="align-items: center; text-align: center;"
+                    onsubmit="return confirm('Are you sure you want to unregister from the event: {{ event.event_name }}?');"
+                    method="POST" action="{% url 'unregister-event' event.id  %}">{% csrf_token %}
+                    <button type="submit" class="btn btn-danger mb-2 form-control" style="font-weight: 800;">UNREGISTER</button>
+                  </form>
+                </div>
+              </div>
+            {% endif %}
+          {% elif event.is_registration_open and event.id not in user_registered_events_approved and event.id in user_registered_events_pending and event.id not in user_registered_events_rejected and event.id not in user_confirmed_attendance %}
+            <h5 class="mb-2"><i>Your registration awaits approval and verification by the moderator. Please check back later and refer to your transactions page for the status.</i></h5>
+          {% elif event.is_registration_open and event.id not in user_registered_events_approved and event.id not in user_registered_events_pending and event.id not in user_registered_events_rejected and event.id not in user_confirmed_attendance %}
+          <div class="col container-fluid" style="align-items: center; text-align: center;">
+            <div class="form-group col-md my-3" style="margin-left: 1em; margin-right: 1em;">
+              <form style="align-items: center; text-align: center;"
+                onsubmit="return confirm('Confirm registration for the event: {{ event.event_name }}?');" method="POST"
+                action="{% url 'register-event' event.id  %}">{% csrf_token %}
+                <button type="submit" class="btn btn-primary mb-2 form-control" style="font-weight: 800;">REGISTER</button>
+              </form>
+            </div>
+          </div>
+          {% elif event.is_registration_open and event.id not in user_registered_events_approved and event.id not in user_registered_events_pending and event.id in user_registered_events_rejected and event.id not in user_confirmed_attendance %}
+            <h5 class="mb-2"><i>Your registration transaction has been <b>rejected</b>. This may be either due to invalid or unclear receipt. For clarifications and dispute, please reach the support team through the following contact information.</i></h5>
+            
+            <div class="col container-fluid" style="align-items: center; text-align: center;">
+              <div class="form-group col-md my-3" style="margin-left: 1em; margin-right: 1em;">
+                <h5><b>Email Address/es:</b></h5>
+                <p>
+                  {% for support_contact in support_contacts_email %}
+                    {{ support_contact }}<br>
+                  {% endfor %}
+                </p>
+              </div>
+            </div>
+
+            <div class="col container-fluid" style="align-items: center; text-align: center;">
+              <div class="form-group col-md my-3" style="margin-left: 1em; margin-right: 1em;">
+                <h5><b>Contact Number/s:</b></h5>
+                <p>
+                  {% for support_contact in support_contacts_number %}
+                    {{ support_contact }}<br>
+                  {% endfor %}
+                </p>
+              </div>
+            </div>
+
+            {% else %}
+            <h5 class="mb-2"><i>Registration is either closed or not yet available.</i></h5>
+          {% endif %}
+          
+          {% if event.is_attendance_open and event.id in user_registered_events_approved and event.id not in user_registered_events_pending and event.id not in user_registered_events_rejected and event.id not in user_confirmed_attendance %}
+          <div class="col container-fluid" style="align-items: center; text-align: center;">
+            <div class="form-group col-md my-3" style="margin-left: 1em; margin-right: 1em;">
+              <form style="align-items: center; text-align: center;"
+                method="POST"
+                action="{% url 'confirm-attendance' event.id  %}">{% csrf_token %}
+                <button type="submit" class="btn btn-secondary mb-2 form-control" style="font-weight: 800;">CONFIRM ATTENDANCE</button>
+              </form>
+            </div>
+          </div>
+          {% elif event.is_attendance_open and event.id in user_registered_events_approved and event.id not in user_registered_events_pending and event.id not in user_registered_events_rejected and event.id in user_confirmed_attendance %}
+            <h5 class="mb-2"><i>Your attendance for the event has been recorded.</i></h5>
+          {% elif event.is_attendance_open is False and event.id in user_registered_events_approved and event.id not in user_registered_events_pending and event.id not in user_registered_events_rejected and event.id not in user_confirmed_attendance %}
+            <h5 class="mb-2"><i>Check back later for attendance or wait for the moderator's announcement.</i></h5>
+          {% else %}
+            
+          {% endif %}
+        </div>
+        <br>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock %}

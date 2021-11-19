@@ -1,0 +1,88 @@
+{% extends 'member/base.html' %}
+{% load static %}
+
+{% block title %}
+EVEREST | Event Registration Transaction Form
+{% endblock %}
+
+{% block content %}
+
+<style>
+  upload-image-receipt {
+    min-height: 20em;
+  }
+</style>
+
+<main class="">
+
+  <!-- start Popup -->
+  {% for message in messages %}
+    {% if form.errors %}
+      {% for field in form %}
+        {% for error in field.errors %}
+          <div class="alert alert-danger alert-dismissible"
+            style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+            <strong>{{ error|escape }}</strong>
+            <button type="button" class="close btn btn-interact text-white" data-dismiss="alert"
+              style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+          </div>
+        {% endfor %}
+      {% endfor %}
+    {% endif %}
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+      <p class="alert alert-danger alert-link alert-dismissible text-white"
+        style="z-index: 2; background-color: #C0392B; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+        {{ message }}
+        <button type="button" class="close btn btn-interact" data-dismiss="alert"
+          style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+      </p>
+    {% else %}
+      <p class="alert alert-success alert-link alert-dismissible text-white"
+        style="z-index: 2; background-color: #27AE60; position: absolute; margin-left: 2em; right: 2em; top: 8em;">
+        {{message}}
+        <button type="button" class="close btn btn-interact" data-dismiss="alert"
+          style="position: absolute; top:0; right: -2.7em;"><i class="far fa-times-circle fa-1x text-white"></i></button>
+      </p>
+    {% endif %}
+  {% endfor %}
+  <!-- end Popup -->
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-group row" style="margin-left: 1em;">
+      <div class="form-group row">
+        <div class="col-md" style="margin-top:0.5rem; margin-bottom:0.5rem;">
+          <h5>Attachment for receipt/proof of payment subject to verification:</h5>
+          <p><i><b>Note:</b> This upload form only accepts images.</i></p>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-md" style="margin-top:0.5rem; margin-bottom:0.5rem;">
+          <input type="file" name="receipt" accept="image/*" class="form-control upload-image-receipt" id="id_receipt" required>
+          <img id="image" class="my-2" style="width: 100%; object-fit: cover; align-self: center;"/>
+          <div id="placeholderdiv" style="background-color: rgb(219, 225, 226); width: 100%; height: 20em; text-align: center; display: flex; align-items: center; justify-content: center;">
+            <h6 style="font-weight: bold;">Attachment Preview</h6>
+          </div>
+
+        </div>
+      </div>
+      <div class="form-group row my-3">
+        <div class="col-md">
+          <button type="submit" class="btn btn-warning form-control text-white" style="font-weight: 800;">SUBMIT FOR APPROVAL</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+</main>
+
+<script>
+  document.getElementById('id_receipt').onchange = function () {
+      var src = URL.createObjectURL(this.files[0])
+      document.getElementById('image').src = src
+      document.getElementById('placeholderdiv').style.display = "none";
+    }
+</script>
+
+{% endblock %}
